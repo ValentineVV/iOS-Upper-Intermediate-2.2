@@ -34,22 +34,6 @@ final class WeatherViewController: UIViewController, CLLocationManagerDelegate {
         refreshControll.addTarget(self,
                                   action: #selector(didPullToRefresh(sender:)),
                                   for: .valueChanged)
-        
-        guard let location = locationManager.location else { return }
-        getWeatherForLocation(location: location)
-    }
-    
-    private func getWeatherForLocation(location: CLLocation) {
-        if location.horizontalAccuracy > 0 {
-
-            locationManager.stopUpdatingLocation()
-
-            let latitude = String(location.coordinate.latitude)
-            let longitude = String(location.coordinate.longitude)
-            let params : [String : String] = ["lat" : latitude, "lon" : longitude, "appid" : APP_ID]
-            
-            getWeatherData(url: WEATHER_URL, parameters: params)
-        }
     }
 
     @objc private func didPullToRefresh(sender: Any) {
@@ -89,7 +73,16 @@ final class WeatherViewController: UIViewController, CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[locations.count - 1]
-        getWeatherForLocation(location: location)
+        if location.horizontalAccuracy > 0 {
+
+            locationManager.stopUpdatingLocation()
+
+            let latitude = String(location.coordinate.latitude)
+            let longitude = String(location.coordinate.longitude)
+            let params : [String : String] = ["lat" : latitude, "lon" : longitude, "appid" : APP_ID]
+            
+            getWeatherData(url: WEATHER_URL, parameters: params)
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
